@@ -1,13 +1,13 @@
 ### This code tries to implement the demos/gsm8k.ipynb notebook in a script format.
 
-from argprase import ArgumentParser
+from argparse import ArgumentParser
 import os
 
 # has to come before imports, as we can only specify model via env variables
 args = ArgumentParser()
 args.add_argument("--dataset", type=str, default="openai/gsm8k")
 args.add_argument("--revision", type=str, default="main")
-args.add_argument("--model", type=str)
+args.add_argument("--model", type=str, default="vllm-ConfidentialMind/Mistral-Small-24B-Instruct-2501_GPTQ_G128_W4A16_MSE")
 args = args.parse_args()
 
 os.environ["MODEL"] = args.model
