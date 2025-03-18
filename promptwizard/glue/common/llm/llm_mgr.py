@@ -23,7 +23,10 @@ def call_api(messages):
     assert len(messages) == 2
     assert messages[1]["role"] == "user"
     message = messages[1]["content"]
+    print()
+    print(message)
     prediction = llm.get_response(message)
+    print(prediction)
     return prediction[0]
 
 
