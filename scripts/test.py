@@ -8,9 +8,11 @@ args = ArgumentParser()
 args.add_argument("--dataset", type=str, default="openai/gsm8k")
 args.add_argument("--revision", type=str, default="main")
 args.add_argument("--model", type=str, default="vllm-ConfidentialMind/Mistral-Small-24B-Instruct-2501_GPTQ_G128_W4A16_MSE")
+args.add_argument("--seed", type=int, default=42)
 args = args.parse_args()
 
 os.environ["MODEL"] = args.model
+os.environ["SEED"] = args.seed
 # import promptwizard
 from promptwizard.glue.promptopt.instantiate import GluePromptOpt
 from promptwizard.glue.promptopt.techniques.common_logic import DatasetSpecificProcessing
