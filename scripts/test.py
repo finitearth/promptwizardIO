@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     train_file_name = os.path.join("data", "train.jsonl")
     test_file_name = os.path.join("data", "test.jsonl")
-    path_to_config = "configs"
+    path_to_config = "../configs"
     promptopt_config_path = os.path.join(path_to_config, "promptopt_config.yaml")
     setup_config_path = os.path.join(path_to_config, "setup_config.yaml")
 
@@ -110,22 +110,3 @@ if __name__ == "__main__":
     best_prompt, expert_profile = gp.get_best_prompt(use_examples=True,run_without_train_examples=False,generate_synthetic_examples=False)
 
     print(f"Best prompt: {best_prompt} \nExpert profile: {expert_profile}")
-    # import pickle 
-
-    # if not os.path.exists("results"):
-    #     os.system("mkdir results")
-        
-    # with open("results/best_prompt.pkl", 'wb') as f:
-    #     pickle.dump(best_prompt, f)
-    # with open("results/expert_profile.pkl", 'wb') as f:
-    #     pickle.dump(expert_profile, f)
-
-
-
-    # gp.EXPERT_PROFILE = expert_profile
-    # gp.BEST_PROMPT = best_prompt
-
-    # # Function call to evaluate the prompt
-    # accuracy = gp.evaluate(test_file_name)
-
-    # print(f"Final Accuracy: {accuracy}")
