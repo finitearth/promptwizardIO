@@ -12,7 +12,7 @@ args.add_argument("--seed", type=int, default=42)
 args = args.parse_args()
 
 os.environ["MODEL"] = args.model
-os.environ["SEED"] = args.seed
+os.environ["SEED"] = str(args.seed)
 # import promptwizard
 from promptwizard.glue.promptopt.instantiate import GluePromptOpt
 from promptwizard.glue.promptopt.techniques.common_logic import DatasetSpecificProcessing
