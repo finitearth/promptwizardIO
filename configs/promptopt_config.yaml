@@ -32,7 +32,7 @@ task_description: "You are a mathematics expert. You will be given a mathematics
 # Base instruction, in line with your dataset. This will be fed to prompt
 base_instruction: "Lets think step by step."
 # Instruction for specifying answer format
-answer_format: "For each question present the reasoning followed by the correct answer."
+answer_format: "For each question present the reasoning followed by the correct answer within <final_answer> </final_answer> tags."
 # Number of samples from dataset, set aside as training data. In every iteration we would be drawing
 # `questions_batch_size` examples from training data with replacement.
 seen_set_size: 25

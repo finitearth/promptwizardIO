@@ -54,31 +54,8 @@ class GSM8k(DatasetSpecificProcessing):
         save_jsonlist(dataset_jsonl, examples_set, "w")
 
     def extract_final_answer(self, answer: str):
-        
-        if not answer:
-            return self.INVALID_ANS
+        return answer.split("</final_answer>")[0].split("<final_answer>")[-1].strip()
 
-        model_pred = answer.lower()
-        preds = model_pred.split(self.ANSWER_START.lower())
-        answer_flag = True if len(preds) > 1 else False
-
-        pred = preds[-1].replace(",", "")
-        pred = [s for s in findall(r'-?\d+\.?\d*', pred)]
-
-        if len(pred) == 0:
-            return self.INVALID_ANS
-
-        if answer_flag:
-            # choose the first element in list
-            pred = pred[0]
-        else:
-            # choose the last element in list
-            pred = pred[-1]
-
-        # (For arithmetic tasks) if a word ends with period, it will be omitted ...
-        if pred[-1] == ".":
-            pred = pred[:-1]
-        return pred
     
 
 if __name__ == "__main__":
