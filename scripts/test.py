@@ -2,90 +2,97 @@
 
 from argparse import ArgumentParser
 import os
+import random
 
 # has to come before imports, as we can only specify model via env variables
-args = ArgumentParser()
-args.add_argument("--dataset", type=str, default="openai/gsm8k")
-args.add_argument("--revision", type=str, default="main")
-args.add_argument("--model", type=str, default="vllm-ConfidentialMind/Mistral-Small-24B-Instruct-2501_GPTQ_G128_W4A16_MSE")
-args.add_argument("--seed", type=int, default=42)
-args = args.parse_args()
+parser = ArgumentParser()
+parser.add_argument("--experiment-name", required=True)
+parser.add_argument("--budget-per-run", type=int, required=True)
+parser.add_argument("--dataset", type=str, default="openai/gsm8k")
+parser.add_argument("--model", type=str, default="vllm-ConfidentialMind/Mistral-Small-24B-Instruct-2501_GPTQ_G128_W4A16_MSE")
+parser.add_argument("--model-revision", type=str, default="main")
+parser.add_argument("--output-dir", default="results/")
+parser.add_argument("--max-model-len", type=int, required=True)
+parser.add_argument("--random-seed", type=int, required=True)
+parser.add_argument("--optimizer", required=True)
+parser.add_argument("--n-steps", type=int, default=999)
+
+# ignored arguments
+parser.add_argument("--population-size", type=int)
+parser.add_argument("--n-eval-samples", type=int)
+parser.add_argument("--evoprompt-ga-template", default="standard")
+parser.add_argument("--block-size", type=int)
+parser.add_argument("--length-penalty", type=float)
+parser.add_argument("--crossovers-per-iter", type=int)
+parser.add_argument("--upper-shots", type=int)
+parser.add_argument("--max-n-blocks-eval", type=int)
+parser.add_argument("--alpha", type=float)
+parser.add_argument("--shuffle-blocks-per-iter", action="store_true", default=False)
+
+args = parser.parse_args()
+
+assert args.optimizer == "promptwizard"
 
 os.environ["MODEL"] = args.model
-os.environ["SEED"] = str(args.seed)
+os.environ["MODEL_REVISION"] = args.model_revision
+os.environ["MAX_MODEL_LEN"] = str(args.max_model_len)
+os.environ["SEED"] = str(args.random_seed)
+
 # import promptwizard
 from promptwizard.glue.promptopt.instantiate import GluePromptOpt
 from promptwizard.glue.promptopt.techniques.common_logic import DatasetSpecificProcessing
-from promptwizard.glue.common.utils.file import save_jsonlist
-from typing import Any
-from tqdm import tqdm
-from re import compile, findall
-from datasets import load_dataset
+import pandas as pd
 
 from dotenv import load_dotenv
+
 load_dotenv(override = True)
 
+from capo.utils import generate_random_hash, seed_everything
+from capo.load_datasets import get_tasks
 
-class GSM8k(DatasetSpecificProcessing):
-    def dataset_to_jsonl(self, dataset_jsonl: str, **kwargs: Any) -> None:
-        def extract_answer_from_output(completion):
-            # Your functions for metrics and prompt building
-            ans_re = compile(r"#### (\-?[0-9\.\,]+)")
-            self.INVALID_ANS = "[invalid]"
 
-            match = ans_re.search(completion)
-            if match:
-                match_str = match.group(1).strip()
-                match_str = match_str.replace(",", "")
-                return match_str
-            else:
-                return self.INVALID_ANS
-
-        examples_set = []
-
-        for _, sample in tqdm(enumerate(kwargs["dataset"]), desc="Evaluating samples"):
-            example = {
-              DatasetSpecificProcessing.QUESTION_LITERAL: sample['question'],
-              DatasetSpecificProcessing.ANSWER_WITH_REASON_LITERAL: sample['answer'],
-              DatasetSpecificProcessing.FINAL_ANSWER_LITERAL: extract_answer_from_output(sample["answer"])
-            } 
-            examples_set.append(example)
-
-        save_jsonlist(dataset_jsonl, examples_set, "w")
-
+class Processor(DatasetSpecificProcessing):
     def extract_final_answer(self, answer: str):
         return answer.split("</final_answer>")[0].split("<final_answer>")[-1].strip()
 
     
-
 if __name__ == "__main__":
-    gsm8k_processor = GSM8k()
+    logging_dir = args.output_dir + args.experiment_name + "/" + generate_random_hash() + "/"
+    seed_everything(args.random_seed)
 
-    if not os.path.exists("data"):
-        os.mkdir("data")
-    
-    dataset = load_dataset(args.dataset, "main")
-    num_samples = 0
-    for dataset_type in ['train','test']:
-        data_list = []
-        for data in dataset[dataset_type]:
-            data_list.append({"question": data['question'], "answer": data['answer']})
-            if num_samples == 100 and dataset_type == 'train': # We sample only 100 train examples and use 25 out them for training randomly
-                break
-            num_samples += 1
-        gsm8k_processor.dataset_to_jsonl("data/"+ dataset_type+'.jsonl', dataset=data_list)
+    train_file_name = "../temp/promptwizard/data.jsonl"
+    dev_task, _, _ = get_tasks(args.dataset, args.optimizer, block_size=args.block_size, seed=args.random_seed)
+    pd.DataFrame({
+        "question": dev_task.xs,
+        "final_answer": dev_task.ys
+    }).to_json(train_file_name)
 
-    train_file_name = os.path.join("data", "train.jsonl")
-    test_file_name = os.path.join("data", "test.jsonl")
+    # overwrite config
+    initial_prompt = random.sample(dev_task.initial_prompts, 1)[0]
+    task_desc = dev_task.task_description
+
+    with open("configs/base_config.yaml", "r") as f:
+        config = f.read()
+    config = config.replace("<initial_prompt>", initial_prompt)
+    config = config.replace("<task_desc>", task_desc)
+    with open("configs/temp_config.yaml", "w") as f:
+        f.write(config)
+
     path_to_config = "configs"
-    promptopt_config_path = os.path.join(path_to_config, "promptopt_config.yaml")
+    promptopt_config_path = os.path.join(path_to_config, "temp_config.yaml")
     setup_config_path = os.path.join(path_to_config, "setup_config.yaml")
 
     gp = GluePromptOpt(promptopt_config_path,
                    setup_config_path,
                    train_file_name,
-                   gsm8k_processor)
+                   Processor())
     
     best_prompt, expert_profile = gp.get_best_prompt(use_examples=True,run_without_train_examples=False,generate_synthetic_examples=False)
 
     print(f"Best prompt: {best_prompt} \nExpert profile: {expert_profile}")
+
+    pd.DataFrame({
+        "step": [1],
+        "prompt": [best_prompt],
+        "system_prompt": [expert_profile]
+    }).to_parquet(logging_dir + "step_results.parquet")

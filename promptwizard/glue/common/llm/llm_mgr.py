@@ -17,7 +17,13 @@ logger = get_glue_logger(__name__)
 
 from promptolution.llms import get_llm
 
-llm = get_llm(os.environ["MODEL"], model_storage_path="../models", max_model_len=4096, seed=int(os.environ["SEED"]))
+llm = get_llm(
+    os.environ["MODEL"],
+    revision=os.environ["MODEL_REVISION"], 
+    model_storage_path="../models", 
+    max_model_len=int(os.environ["MAX_MODEL_LEN"]),
+    seed=int(os.environ["SEED"])
+)
 
 def call_api(messages):
     assert len(messages) == 2
