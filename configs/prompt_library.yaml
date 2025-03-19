@@ -25,12 +25,12 @@ mode:
       prepend_system_prompts: False
       prepend_system_guidelines: False
 
-  generation:
-    - name: FLASH_PROFILE
-      prompt_template: |
-        {user_msg}
-      prepend_system_prompts: False
-      prepend_system_guidelines: False
-      llm_request_type: rag-query
-      emb_model_id: text embedding ada 002 [vellm-openai2]
-      llm_model_id: gpt 35 Turbo [vellm-openai2]
+  # generation:
+  #   - name: FLASH_PROFILE
+  #     prompt_template: |
+  #       {user_msg}
+  #     prepend_system_prompts: False
+  #     prepend_system_guidelines: False
+  #     llm_request_type: rag-query
+  #     emb_model_id: text embedding ada 002 [vellm-openai2]
+  #     llm_model_id: gpt 35 Turbo [vellm-openai2]

@@ -48,7 +48,7 @@ class GSM8k(DatasetSpecificProcessing):
               DatasetSpecificProcessing.QUESTION_LITERAL: sample['question'],
               DatasetSpecificProcessing.ANSWER_WITH_REASON_LITERAL: sample['answer'],
               DatasetSpecificProcessing.FINAL_ANSWER_LITERAL: extract_answer_from_output(sample["answer"])
-            }
+            } 
             examples_set.append(example)
 
         save_jsonlist(dataset_jsonl, examples_set, "w")
