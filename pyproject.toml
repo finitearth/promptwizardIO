@@ -1,3 +1,10 @@
+[tool.poetry]
+name = "promptwizard"
+version = "1.0.0"
+description = "Fork with slight customization from promptwizard repo by Agarwal et al., 2024"
+authors = ["Agarwal et al"]
+readme = "README.md"
+
 [tool.black]
 line-length = 88
 target-version = ['py38']
