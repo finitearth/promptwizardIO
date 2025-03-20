@@ -1,23 +1,24 @@
 ### This code tries to implement the demos/gsm8k.ipynb notebook in a script format.
-
+"""
+example call:
+python scripts/test.py --experiment-name prompt_wizard --dataset openai/gsm8k --max-model-len 4096 --random-seed 42 --optimizer promptwizard --model vllm-ConfidentialMind/Mistral-Small-24B-Instruct-2501_GPTQ_G128_W4A16_MSE --model-revision main --output-dir results/ --n-steps 999 --budget-per-run 1000
+"""
 from argparse import ArgumentParser
-import os
-import random
 
 # has to come before imports, as we can only specify model via env variables
 parser = ArgumentParser()
 parser.add_argument("--experiment-name", required=True)
-parser.add_argument("--budget-per-run", type=int, required=True)
-parser.add_argument("--dataset", type=str, default="openai/gsm8k")
-parser.add_argument("--model", type=str, default="vllm-ConfidentialMind/Mistral-Small-24B-Instruct-2501_GPTQ_G128_W4A16_MSE")
+parser.add_argument("--dataset", type=str, required=True)
+parser.add_argument("--model", type=str, required=True)
 parser.add_argument("--model-revision", type=str, default="main")
 parser.add_argument("--output-dir", default="results/")
 parser.add_argument("--max-model-len", type=int, required=True)
 parser.add_argument("--random-seed", type=int, required=True)
 parser.add_argument("--optimizer", required=True)
-parser.add_argument("--n-steps", type=int, default=999)
 
 # ignored arguments
+parser.add_argument("--n-steps", type=int, default=999)
+parser.add_argument("--budget-per-run", type=int, required=True)
 parser.add_argument("--population-size", type=int)
 parser.add_argument("--n-eval-samples", type=int)
 parser.add_argument("--evoprompt-ga-template", default="standard")
@@ -38,14 +39,12 @@ os.environ["MODEL_REVISION"] = args.model_revision
 os.environ["MAX_MODEL_LEN"] = str(args.max_model_len)
 os.environ["SEED"] = str(args.random_seed)
 
-# import promptwizard
-from promptwizard.glue.promptopt.instantiate import GluePromptOpt
-from promptwizard.glue.promptopt.techniques.common_logic import DatasetSpecificProcessing
+import os
+import random
+
+from capo.promptwizard.glue.promptopt.instantiate import GluePromptOpt
+from capo.promptwizard.glue.promptopt.techniques.common_logic import DatasetSpecificProcessing
 import pandas as pd
-
-from dotenv import load_dotenv
-
-load_dotenv(override = True)
 
 from capo.utils import generate_random_hash, seed_everything
 from capo.load_datasets import get_tasks

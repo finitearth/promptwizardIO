@@ -1,11 +1,8 @@
 from os.path import dirname, join
-import pickle
 import time
-from typing import Any
 
-from ..common.base_classes import LLMConfig, SetupConfig
+from ..common.base_classes import SetupConfig
 from ..common.constants.log_strings import CommonLogsStr
-from ..common.llm.llm_mgr import LLMMgr
 from ..common.utils.logging import get_glue_logger, set_logging_config
 from ..common.utils.file import read_jsonl, yaml_to_class, yaml_to_dict, read_jsonl_row
 from ..paramlogger import ParamLogger
@@ -55,8 +52,9 @@ class GluePromptOpt:
             if data_processor:
                 self.data_processor = data_processor
             else:
-                with open(dataset_processor_pkl_path, "rb") as file:
-                    self.data_processor = pickle.load(file)  # datatype: class DatasetSpecificProcessing
+                raise ValueError("data_processor is None. Please provide data_processor object")
+                # with open(dataset_processor_pkl_path, "rb") as file:
+                #     self.data_processor = pickle.load(file)  # datatype: class DatasetSpecificProcessing
 
         prompt_config_dict = yaml_to_dict(prompt_config_path)
         prompt_opt_cls, prompt_opt_hyperparam_cls, promptpool_cls = get_promptopt_class(
@@ -106,7 +104,7 @@ class GluePromptOpt:
         self.prompt_opt = prompt_opt_cls(training_dataset, base_path, self.setup_config,
                                          self.prompt_pool, self.data_processor, self.logger)
 
-    def get_best_prompt(self,use_examples=False,run_without_train_examples=False,generate_synthetic_examples=False) -> (str, Any):
+    def get_best_prompt(self,use_examples=False,run_without_train_examples=False,generate_synthetic_examples=False):# -> (str, Any):
         """
         Call get_best_prompt() method of class PromptOptimizer & return its value.
         :return: (best_prompt, expert_profile)
