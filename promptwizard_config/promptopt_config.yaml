@@ -10,15 +10,15 @@ prompt_technique_name: "critique_n_refine"
 unique_model_id: gpt-4o
 # Number of iterations for conducting <mutation_rounds>  rounds of mutation of task description
 # followed by refinement of instructions
-mutate_refine_iterations: 9 #3
+mutate_refine_iterations: 3
 # Number of rounds of mutation to be performed when generating different styles
-mutation_rounds: 9 #3
+mutation_rounds: 3
 # Refine instruction post mutation
 refine_instruction: true
 # Number of iterations for refining task description and in context examples for few-shot
-refine_task_eg_iterations: 9 #3
+refine_task_eg_iterations: 3
 # Number of variations of prompts to generate in given iteration
-style_variation: 15 #5
+style_variation: 5
 # Number of questions to be asked to LLM in a single batch, during training step
 questions_batch_size: 1
 # Number of batches of questions to correctly answered, for a prompt to be considered as performing good
