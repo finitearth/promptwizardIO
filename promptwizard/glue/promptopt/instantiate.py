@@ -128,13 +128,13 @@ class GluePromptOpt:
 
         self.setup_config = yaml_to_class(setup_config_path, SetupConfig)
         self.prompt_opt_param = yaml_to_class(prompt_config_path, prompt_opt_hyperparam_cls)
-        current_dir = dirname(__file__)
-        default_yaml_path = join(current_dir,
-                                 "techniques",
-                                 prompt_config_dict[PromptOptimizationLiterals.PROMPT_TECHNIQUE_NAME],
-                                 "prompt_pool.yaml")
+        # current_dir = dirname(__file__)
+        # default_yaml_path = join(current_dir,
+        #                          "techniques",
+        #                          prompt_config_dict[PromptOptimizationLiterals.PROMPT_TECHNIQUE_NAME],
+        #                          "prompt_pool.yaml")
 
-        self.prompt_pool = PROMPT_POOL_DICT #yaml_to_class(prompt_pool_path, promptpool_cls, default_yaml_path)
+        self.prompt_pool = promptpool_cls(**PROMPT_POOL_DICT) #yaml_to_class(prompt_pool_path, promptpool_cls, default_yaml_path)
 
         if dataset_jsonl != None:
             dataset = read_jsonl(dataset_jsonl)
