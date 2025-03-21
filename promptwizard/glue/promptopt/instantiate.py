@@ -10,6 +10,8 @@ from ..promptopt.constants import PromptOptimizationLiterals
 from ..promptopt.techniques.common_logic import DatasetSpecificProcessing
 from ..promptopt.utils import get_promptopt_class
 
+import os
+
 PROMPT_POOL_DICT = {
     "final_prompt": "{instruction}\n{few_shot_examples}\n\n{answer_format}",
     "eval_prompt": "{instruction}\n\n[Question] {question}\n[Answer] ",
@@ -182,7 +184,7 @@ class GluePromptOpt:
         self.BEST_PROMPT, self.EXPERT_PROFILE = self.prompt_opt.get_best_prompt(self.prompt_opt_param,use_examples=use_examples,run_without_train_examples=run_without_train_examples,generate_synthetic_examples=generate_synthetic_examples)
 
         self.logger.info(f"Time taken to find best prompt: {(time.time() - start_time)} sec")
-        return self.BEST_PROMPT, self.EXPERT_PROFILE
+        return self.BEST_PROMPT, self.EXPERT_PROFILE,  dict(os.environ["TOKEN_COUNTS"])
 
     def evaluate(self, test_dataset_jsonl: str) -> float:
         """
