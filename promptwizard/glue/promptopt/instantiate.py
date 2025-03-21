@@ -185,7 +185,8 @@ class GluePromptOpt:
 
         self.logger.info(f"Time taken to find best prompt: {(time.time() - start_time)} sec")
         if return_token_counts:
-            return self.BEST_PROMPT, self.EXPERT_PROFILE,  dict(os.environ["TOKEN_COUNTS"])
+            token_count = self.prompt_opt.chat_completion(user_prompt="", system_prompt="", only_return_token_count=True)
+            return self.BEST_PROMPT, self.EXPERT_PROFILE, token_count
         return self.BEST_PROMPT, self.EXPERT_PROFILE
 
     def evaluate(self, test_dataset_jsonl: str) -> float:

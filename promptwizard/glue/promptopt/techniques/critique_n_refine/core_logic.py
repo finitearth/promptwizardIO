@@ -69,7 +69,7 @@ class CritiqueNRefine(PromptOptimizer, UniversalBaseClass):
         self.iolog.reset_eval_glue(base_path)
 
     @iolog.log_io_params
-    def chat_completion(self, user_prompt: str, system_prompt: str = None):
+    def chat_completion(self, user_prompt: str, system_prompt: str = None, only_return_token_count=False):
         """
         Make a chat completion request to the OpenAI API.
 
@@ -84,7 +84,7 @@ class CritiqueNRefine(PromptOptimizer, UniversalBaseClass):
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ]
-        response = LLMMgr.chat_completion(messages)
+        response = LLMMgr.chat_completion(messages, only_return_token_count=only_return_token_count)
         return response
 
     @iolog.log_io_params

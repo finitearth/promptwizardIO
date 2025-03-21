@@ -26,16 +26,17 @@ llm = get_llm(
     seed=int(os.environ["SEED"])
 )
 
-def call_api(messages):
+def call_api(messages, only_return_token_count=False):
+    if only_return_token_count:
+        return llm.get_token_count()
     assert len(messages) == 2
+    assert messages[0]["role"] == "system"
     assert messages[1]["role"] == "user"
-    message = messages[1]["content"]
-    print()
-    print(message)
-    prediction = llm.get_response(message)
+    system_message = messages[0]["content"]
+    user_message = messages[1]["content"]
+    prediction = llm.get_response(prompt=user_message, system_prompt=system_message)
     print(prediction)
     print(f"current token count: {llm.get_token_count()}")
-    os.environ["TOKEN_COUNT"] = str(llm.get_token_count())
     return prediction[0]
 
 
@@ -72,12 +73,12 @@ def call_api(messages):
 
 class LLMMgr:
     @staticmethod
-    def chat_completion(messages: Dict):
+    def chat_completion(messages: Dict, only_return_token_count: bool = False):
         llm_handle = os.environ.get("MODEL_TYPE", "AzureOpenAI")
         try:
             if(llm_handle == "AzureOpenAI"): 
                 # Code to for calling LLMs
-                return call_api(messages)
+                return call_api(messages, only_return_token_count)
             elif(llm_handle == "LLamaAML"):
                 # Code to for calling SLMs
                 return 0
