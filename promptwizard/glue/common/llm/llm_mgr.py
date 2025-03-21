@@ -34,7 +34,7 @@ def call_api(messages, only_return_token_count=False):
     assert messages[1]["role"] == "user"
     system_message = messages[0]["content"]
     user_message = messages[1]["content"]
-    prediction = llm.get_response(prompt=user_message, system_prompt=system_message)
+    prediction = llm.get_response(prompts=user_message, system_prompts=system_message)
     print(prediction)
     print(f"current token count: {llm.get_token_count()}")
     return prediction[0]
