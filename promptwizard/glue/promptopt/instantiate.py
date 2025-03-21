@@ -172,7 +172,7 @@ class GluePromptOpt:
         self.prompt_opt = prompt_opt_cls(training_dataset, base_path, self.setup_config,
                                          self.prompt_pool, self.data_processor, self.logger)
 
-    def get_best_prompt(self,use_examples=False,run_without_train_examples=False,generate_synthetic_examples=False):# -> (str, Any):
+    def get_best_prompt(self,use_examples=False,run_without_train_examples=False,generate_synthetic_examples=False, return_token_counts=False):# -> (str, Any):
         """
         Call get_best_prompt() method of class PromptOptimizer & return its value.
         :return: (best_prompt, expert_profile)
@@ -184,7 +184,9 @@ class GluePromptOpt:
         self.BEST_PROMPT, self.EXPERT_PROFILE = self.prompt_opt.get_best_prompt(self.prompt_opt_param,use_examples=use_examples,run_without_train_examples=run_without_train_examples,generate_synthetic_examples=generate_synthetic_examples)
 
         self.logger.info(f"Time taken to find best prompt: {(time.time() - start_time)} sec")
-        return self.BEST_PROMPT, self.EXPERT_PROFILE,  dict(os.environ["TOKEN_COUNTS"])
+        if return_token_counts:
+            return self.BEST_PROMPT, self.EXPERT_PROFILE,  dict(os.environ["TOKEN_COUNTS"])
+        return self.BEST_PROMPT, self.EXPERT_PROFILE
 
     def evaluate(self, test_dataset_jsonl: str) -> float:
         """
