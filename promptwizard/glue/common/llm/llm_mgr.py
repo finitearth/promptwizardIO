@@ -74,17 +74,18 @@ def call_api(messages, only_return_token_count=False):
 class LLMMgr:
     @staticmethod
     def chat_completion(messages: Dict, only_return_token_count: bool = False):
-        llm_handle = os.environ.get("MODEL_TYPE", "AzureOpenAI")
-        try:
-            if(llm_handle == "AzureOpenAI"): 
-                # Code to for calling LLMs
-                return call_api(messages, only_return_token_count)
-            elif(llm_handle == "LLamaAML"):
-                # Code to for calling SLMs
-                return 0
-        except Exception as e:
-            print(e)
-            return "Sorry, I am not able to understand your query. Please try again."
+        return call_api(messages, only_return_token_count)
+        # llm_handle = os.environ.get("MODEL_TYPE", "AzureOpenAI")
+        # try:
+        #     if(llm_handle == "AzureOpenAI"): 
+        #         # Code to for calling LLMs
+                
+        #     elif(llm_handle == "LLamaAML"):
+        #         # Code to for calling SLMs
+        #         return 0
+        # except Exception as e:
+        #     print(e)
+        #     return "Sorry, I am not able to understand your query. Please try again."
             # raise GlueLLMException(f"Exception when calling {llm_handle.__class__.__name__} "
             #                        f"LLM in chat mode, with message {messages} ", e)
         
